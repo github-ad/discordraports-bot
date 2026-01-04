@@ -1,15 +1,6 @@
-const {
-  Client,
-  GatewayIntentBits,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  EmbedBuilder
-} = require("discord.js");
-require("dotenv").config();
+import { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder } from "discord.js";
+import dotenv from "dotenv";
+dotenv.config()
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
