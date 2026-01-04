@@ -23,7 +23,6 @@ client.on("interactionCreate", async interaction => {
       const fields = [
         ["name", "Imię i nazwisko funkcjonariusza"],
         ["badge", "Numer odznaki"],
-        ["unit", "Jednostka"],
         ["case", "Numer sprawy (CAD)"],
         ["report", "Link do raportu (Google Docs)"],
         ["bodycam", "Link do bodycam (Media Fire)"]
@@ -61,7 +60,6 @@ client.on("interactionCreate", async interaction => {
         .addFields(
           { name: "Funkcjonariusz", value: data.name, inline: true },
           { name: "Odznaka", value: data.badge, inline: true },
-          { name: "Jednostka", value: data.unit, inline: true },
           { name: "Raport", value: `[OTWÓRZ RAPORT](${data.report})` },
           { name: "Bodycam", value: `[OTWÓRZ NAGRANIE](${data.bodycam})` }
         )
