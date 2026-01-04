@@ -1,0 +1,27 @@
+{
+  "name": "lspd-report-bot",
+  "version": "1.0.0",
+  "description": "Discord bot LSPD – składanie raportów i bodycamów na forum RP",
+  "main": "index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.0",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": [
+    "discord",
+    "lspd",
+    "rp",
+    "forum",
+    "reports",
+    "bodycam"
+  ],
+  "author": "LSPD RP",
+  "license": "MIT"
+}
