@@ -43,7 +43,7 @@ client.once("ready", async () => {
     );
 
     await channel.send({
-      content: "**Los Santos Police Department – Evidence System**\nKliknij przycisk, aby złożyć raport z interwencji.",
+      content: "**Los Santos Police Department – Axon Records**\nKliknij przycisk, aby złożyć raport z interwencji.",
       components: [row]
     });
 
@@ -67,8 +67,8 @@ client.on("interactionCreate", async interaction => {
     const fields = [
       ["name", "Imię i nazwisko funkcjonariusza"],
       ["badge", "Numer odznaki"],
-      ["case", "Numer sprawy (CAD)"],
-      ["report", "Link do raportu PDF"],
+      ["case", "Numer raportu"],
+      ["report", "Link do raportu"],
       ["bodycam", "Link do nagrania Bodycam"]
     ].map(([id, label]) =>
       new ActionRowBuilder().addComponents(
@@ -94,13 +94,13 @@ client.on("interactionCreate", async interaction => {
     const forum = await interaction.guild.channels.fetch(process.env.FORUM_CHANNEL_ID);
 
     const embed = new EmbedBuilder()
-      .setTitle(`📄 Sprawa ${data.case}`)
+      .setTitle(`Interwencja: ${data.case}`)
       .setColor(3447003)
       .addFields(
-        { name: "👮 Funkcjonariusz", value: data.name, inline: true },
-        { name: "🎖️ Odznaka", value: data.badge, inline: true },
-        { name: "📄 Raport PDF", value: `[OTWÓRZ LINK](${data.report})` },
-        { name: "🎥 Bodycam", value: `[OTWÓRZ LINK](${data.bodycam})` }
+        { name: "Funkcjonariusz:", value: data.name, inline: true },
+        { name: "Odznaka:", value: data.badge, inline: true },
+        { name: "Axon Records - Report:", value: `[OTWÓRZ LINK](${data.report})` },
+        { name: "Axon Evidence Body 3 Video", value: `[OTWÓRZ LINK](${data.bodycam})` }
       )
       .setFooter({ text: "Los Santos Police Department" })
       .setTimestamp();
