@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Discord bot LSPD – składanie raportów i bodycamów na forum RP",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
