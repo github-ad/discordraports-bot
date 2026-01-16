@@ -5,11 +5,25 @@ dotenv.config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-// ================== REJESTRACJA KOMEND SLASH ==================
+/* ================== REJESTRACJA KOMEND ================== */
 const commands = [
   new SlashCommandBuilder()
     .setName("panel")
-    .setDescription("Wyślij panel składania raportów LSPD")
+    .setDescription("Wyślij panel składania raportów LSPD"),
+
+  new SlashCommandBuilder()
+    .setName("blacklist")
+    .setDescription("Nadaj blacklistę użytkownikowi")
+    .addUserOption(o =>
+      o.setName("kto")
+        .setDescription("Osoba objęta blacklistą")
+        .setRequired(true)
+    )
+    .addStringOption(o =>
+      o.setName("za_co")
+        .setDescription("Powód nadania blacklisty")
+        .setRequired(true)
+    )
 ].map(c => c.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
@@ -18,7 +32,10 @@ const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
   try {
     console.log("⏳ Rejestracja komend slash...");
     await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+      Routes.applicationGuildCommands(
+        process.env.CLIENT_ID,
+        process.env.GUILD_ID
+      ),
       { body: commands }
     );
     console.log("✅ Komendy zarejestrowane!");
@@ -27,12 +44,11 @@ const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
   }
 })();
 
-// ================== BOT READY ==================
+/* ================== BOT READY ================== */
 client.once("ready", async () => {
   console.log("🚓 LSPD Report Bot ONLINE");
 
   try {
-    // Wyślij panel z przyciskiem na wybrany kanał
     const channel = await client.channels.fetch(process.env.PANEL_CHANNEL_ID);
 
     const row = new ActionRowBuilder().addComponents(
@@ -53,17 +69,49 @@ client.once("ready", async () => {
   }
 });
 
-// ================== INTERACTION HANDLER ==================
+/* ================== INTERACTION HANDLER ================== */
 client.on("interactionCreate", async interaction => {
 
-  // Kliknięcie przycisku
+  /* ===== KOMENDA /blacklist ===== */
+  if (interaction.isChatInputCommand() && interaction.commandName === "blacklist") {
+
+    const user = interaction.options.getUser("kto");
+    const reason = interaction.options.getString("za_co");
+
+    // Embed DM
+    const dmEmbed = new EmbedBuilder()
+      .setTitle("🚫 Blacklista – Los Santos Police Department")
+      .setColor(15158332)
+      .setDescription(
+        `Zostałeś/aś objęty/a **blacklistą LSPD**.\n\n**Powód:**\n${reason}`
+      )
+      .setFooter({ text: "Los Santos Police Department" })
+      .setTimestamp();
+
+    let dmStatus = "📩 Wiadomość DM wysłana.";
+
+    try {
+      await user.send({ embeds: [dmEmbed] });
+    } catch {
+      dmStatus = "⚠️ Nie udało się wysłać DM (zablokowane lub wyłączone).";
+    }
+
+    await interaction.reply({
+      content:
+        `✅ **Blacklista nadana**\n` +
+        `👤 Osoba: ${user}\n` +
+        `📝 Powód: ${reason}\n\n${dmStatus}`,
+      ephemeral: true
+    });
+  }
+
+  /* ===== PRZYCISK PANELU ===== */
   if (interaction.isButton() && interaction.customId === "open_report_modal") {
 
     const modal = new ModalBuilder()
       .setCustomId("lspd_report_modal")
       .setTitle("LSPD – Raport Interwencji");
 
-    // 5 pól max (Discord limit)
     const fields = [
       ["name", "Imię i nazwisko funkcjonariusza"],
       ["badge", "Numer odznaki"],
@@ -84,11 +132,12 @@ client.on("interactionCreate", async interaction => {
     return interaction.showModal(modal);
   }
 
-  // Submit modala
+  /* ===== SUBMIT MODALA ===== */
   if (interaction.isModalSubmit() && interaction.customId === "lspd_report_modal") {
 
     const data = Object.fromEntries(
-      ["name","badge","case","report","bodycam"].map(id => [id, interaction.fields.getTextInputValue(id)])
+      ["name","badge","case","report","bodycam"]
+        .map(id => [id, interaction.fields.getTextInputValue(id)])
     );
 
     const forum = await interaction.guild.channels.fetch(process.env.FORUM_CHANNEL_ID);
@@ -99,8 +148,8 @@ client.on("interactionCreate", async interaction => {
       .addFields(
         { name: "Funkcjonariusz:", value: data.name, inline: true },
         { name: "Odznaka:", value: data.badge, inline: true },
-        { name: "Axon Records - Report:", value: `[OTWÓRZ LINK](${data.report})` },
-        { name: "Axon Evidence Body 3 Video", value: `[OTWÓRZ LINK](${data.bodycam})` }
+        { name: "Axon Records – Report:", value: `[OTWÓRZ LINK](${data.report})` },
+        { name: "Axon Evidence Body 3 Video:", value: `[OTWÓRZ LINK](${data.bodycam})` }
       )
       .setFooter({ text: "Los Santos Police Department" })
       .setTimestamp();
